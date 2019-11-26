@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="images/favicon.ico">
+<title>My Profile</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="js/jquerysession.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="style/style.css" title="style" />
+<link rel="stylesheet" type="text/css" href="style/util.css">
+<link rel="stylesheet" type="text/css" href="style/main.css">
+
+<!-- <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"> -->
+<!-- <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> -->
+
+<script>
+$(document).ready(function() {
+	var rollNo = $.session.get("rollNo");
+	if(rollNo == null) {
+		window.location.replace('studentLogin.html');
+	}
+});
+
+</script>
+
+</head>
+
+
+<body>
+  <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_image" class="col-xs-12 col-sm-3 col-md-3">
+                <a href="index.php"><img src="style/logo1.jpg" class="img-responsive logo" alt="" /> </a>
+				
+         </div>
+         <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a class="logo_title" href="index.html"><span >IIITB Complaint Portal</span></a></h1>
+
+          
+        </div>
+      </div>
+      <div id="menubar">
+        <ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="studentDashboard.html">My Complaints</a></li>
+          <li><a href="addComplaint.html">Add Complaint</a></li>
+<!--           <li class="selected"><a href="studentProfile.html">Profile</a></li> -->
+<!--           <li><a href="studentSignout.html">Sign out</a></li> -->
+		 <li>
+	        <a id ="demo" href="#">
+	        	<script>
+	        		document.getElementById("demo").innerHTML=$.session.get("rollNo");
+	        	</script> &#9662;
+	        </a>
+	        <ul>
+	            <li><a href="studentProfile.html">Profile</a></li>
+          		<li><a href="studentSignout.html">Sign out</a></li>
+	        </ul>
+	      </li>
+         
+        </ul>
+      </div>
+    </div>
+   
+    <div id="site_content" >
+      
+     
+        <div  style="width: 920px; border:1px solid grey; padding-left: 50px; ">
+		
+				<h3  align="center"><span style="color: #3484B1;"> My Profile</span> </h3>
+				<h4><a href="changePassword.html">Change Password</a></h4>
+				
+				<h3>Roll No: <span id="rollNo" style="color: #3484B1;"></span> </h3>
+				<h3>Name: <span id="name" style="color: #3484B1;"></span> </h3>
+				<h3>Room No: <span id="roomNo" style="color: #3484B1;"></span> </h3>
+				<h3>Email Id: <span id="emailId" style="color: #3484B1;"></span> </h3>
+				<h3>Mobile No.: <span id="mobile" style="color: #3484B1;"></span> </h3>
+				<h3>Hostel: <span id="hostel" style="color: #3484B1;"></span> </h3>
+				
+		</div>
+      
+    </div>
+    <div id="footer">
+      Copyright &copy; 2019 IIIT-Bangalore
+    </div>
+  </div> 
+</body>
+</html>
+
+<script>
+
+$(document).ready(function () {
+	var rollNo = $.session.get("rollNo");
+    $.ajax({
+        url: 'http://localhost:8092//student/?rollNo='+rollNo,
+        method: 'GET',
+        dataType: 'json',
+        dataSrc: function (response) {
+            return response.d;
+        },
+        success: function (data) {
+        	$("#rollNo").html(data.rollNo);
+        	$("#name").html(data.name);
+        	$("#roomNo").html(data.roomNo);
+        	$("#emailId").html(data.emailId);
+        	$("#mobile").html(data.mobile);
+        	$("#hostel").html(data.hostel);
+        },
+        error : function(e) {
+	        alert("Error in Student Commitee")
+	        console.log("ERROR: ", e);
+        }
+    });
+});
+
+</script>
+

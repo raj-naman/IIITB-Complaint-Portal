@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="images/favicon.ico">
+<title>Student Dashboard</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="js/jquerysession.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+<script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<!-- <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"> -->
+<!-- <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> -->
+<link rel="stylesheet" type="text/css" href="style/style.css" title="style" />
+<script>
+$(document).ready(function() {
+	var rollNo = $.session.get("rollNo");
+	if(rollNo == null) {
+		window.location.replace('studentLogin.html');
+	}
+});
+
+</script>
+
+<style type="text/css" class="init">
+	
+td.details-control {
+	background: url('https://datatables.net/examples/resources/details_open.png') no-repeat center center;
+	cursor: pointer;
+}
+td.upvote-control {
+	background: url('images/upvote.png') no-repeat center center;
+	cursor: pointer;
+}
+tr.shown td.details-control {
+	background: url('https://datatables.net/examples/resources/details_close.png') no-repeat center center;
+}
+
+
+	</style>
+<script type="text/javascript">
+function format ( d ) {
+    // `d` is the original data object for the row
+    
+	return '<p>' + 'Name: '+ '<b>' + d.name+  '</b>' + '<br>'+
+    'Hostel: '+ '<b>' + d.hostel+ '</b>' +'<br>'+
+    'Last Updated: '+ '<b>' + d.last_updated+ '</b>' +'<br>'+
+    'Complaint: '+ '<b>' +d.compbody+ '</b>' +'<br>' + '</p>';
+}
+ 
+$(document).ready(function() {
+/* 	var rollNo = $.session.get("rollNo");
+ */    var table = $("#dashboaardTable").DataTable({
+        "ajax": {
+	         url: 'http://localhost:8091//dashboard/',
+	         method: 'get',
+	         dataType: 'json',
+	         dataSrc: function (response) {
+	             return response;
+	         },
+        },
+        "columns": [
+            {
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+            },
+            { "data": "rollNo" },
+            { "data": "commiteeId" },
+            { "data": "status" },
+            { "data": "created_at" },
+            { "data": "upvoteCount" },
+            {
+                "className":      'upvote-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+            },
+        ],
+    }); 
+     
+ 	$('#dashboaardTable tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row( tr );
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+        }
+    }); 
+ 	
+ 	$('#dashboaardTable tbody').on('click', 'td.upvote-control', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row( tr );
+ 
+        var id = row.data().id;
+        localStorage.setItem("id", id);
+        console.log(localStorage.getItem("id"));
+        
+        event.preventDefault();
+		upvote();
+    }); 
+ 	
+ 	function upvote() {
+		
+ 		var id = localStorage.getItem("id");
+		console.log(id);
+		
+		var formData = {
+			rollNo : $.session.get("rollNo")
+		}
+		console.log(formData);
+		/* var rollNo = $("#rollNo").val().trim();
+        var password = $("#password").val().trim(); */
+        var requestURL="http://localhost:8094//complaint/upvote?id="+id;
+
+
+		// DO POST
+		$.ajax({
+			url : requestURL,
+			type : "POST",
+			//contentType : "application/json",
+			data : formData,
+			//dataType : 'json',
+			success : function(response) {
+		        if(response.status == "Pass"){
+		        	alert("Complaint is Upvoted successfully");
+		        	window.location.replace('dashboard.html');
+		        }
+		        else{
+		        	alert("You already Upvoted this complaint");
+		        }
+		        
+		        console.log(response);
+		      },
+		      error : function(e) {
+		        alert("Error in Login Commitee")
+		        console.log("ERROR: ", e);
+		      }
+		});
+		
+
+ 	}
+});
+
+/* $(document).ready(function () {
+    $.ajax({
+        url: 'http://localhost:8091//dashboard/student/mt2018067',
+        method: 'post',
+        dataType: 'json',
+        dataSrc: function (response) {
+            return response.d;
+        },
+        success: function (data) {
+            var table = $('#studentTable').DataTable({
+                data: data,
+                columns: [
+                	{
+                        "className":      'details-control',
+                        "orderable":      false,
+                        "data":           null,
+                        "defaultContent": ''
+                    },
+                    { 'data': 'rollNo' },
+                    { 'data': 'roomNo' },
+                    { 'data': 'status' },
+                    { 'data': 'last_updated' },
+				]
+            });
+        },
+        error : function(e) {
+	        alert("Error in Student Commitee")
+	        console.log("ERROR: ", e);
+        }
+    });
+    
+    $('#studentTable tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row( tr );
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+        }
+    });
+});
+ */
+</script>
+
+</head>
+
+<body>
+  <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_image" class="col-xs-12 col-sm-3 col-md-3">
+                <a href="index.php"><img src="style/logo1.jpg" class="img-responsive logo" alt="" /> </a>
+				
+         </div>
+         <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a class="logo_title" href="index.html"><span >IIITB Complaint Portal</span></a></h1>
+
+          
+        </div>
+      </div>
+      <div id="menubar">
+        <ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li class="selected"><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="studentDashboard.html">My Complaints</a></li>
+          <li><a href="addComplaint.html">Add Complaint</a></li>
+<!--           <li><a href="studentProfile.html">Profile</a></li> -->
+<!--           <li><a href="studentSignout.html">Sign out</a></li> -->
+          <li>
+	        <a id ="demo" href="#">
+	        	<script>
+	        		document.getElementById("demo").innerHTML=$.session.get("rollNo");
+	        	</script> &#9662;
+	        </a>
+	        <ul>
+	            <li><a href="studentProfile.html">Profile</a></li>
+          		<li><a href="studentSignout.html">Sign out</a></li>
+	        </ul>
+	      </li>
+         
+        </ul>
+      </div>
+    </div>
+   
+    <div id="site_content">
+      
+     	<div><h3>Public Complaints</h3> </div>
+        <div style="width: 920px; border: grey; ">
+		
+			<table id="dashboaardTable" class="display">
+		        <thead>
+		            <tr>
+		                <th></th>
+		                <th>Roll No.</th>
+		                <th>Commitee</th>
+		                <th>Status</th>
+		                <th>Created Date</th>
+		                <th>Upvote Count</th>
+		                <th>Upvote</th>
+		                
+		            </tr>
+		        </thead>
+		        
+			</table>
+		</div>
+      
+    </div>
+    <div id="footer">
+      Copyright &copy; 2019 IIIT-Bangalore
+    </div>
+  </div> 
+</body>
+
+
+
+
+</html>
+
