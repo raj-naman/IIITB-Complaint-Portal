@@ -1,0 +1,6 @@
+com/complaintportal/studentservice/dao/StudentRepo.class
+com/complaintportal/studentservice/StudentServiceApplication.class
+com/complaintportal/studentservice/service/NotificationService.class
+com/complaintportal/studentservice/controller/StudentController.class
+com/complaintportal/studentservice/service/Response.class
+com/complaintportal/studentservice/model/Student.class
